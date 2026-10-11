@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Activity 的宿主主题。真实配色全部由 Compose 的 LedgerTheme 决定，
+      这里只需要一个「无 ActionBar 的浅色底」，让冷启动首帧不白闪。
+      刻意不继承 AppCompat / MaterialComponents：本工程没有引入 appcompat，
+      只依赖 ComponentActivity + Compose。
+    -->
+    <style name="Theme.Ledger" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/ledger_window_background</item>
+        <!--
+          targetSdk 35 起系统强制 edge-to-edge；这里同时声明透明状态栏，
+          配合 MainActivity 的 enableEdgeToEdge()，避免出现一条不透明的色带。
+        -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

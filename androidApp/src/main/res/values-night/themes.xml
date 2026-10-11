@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 深色模式下的宿主主题：只影响「System 跟随」生效时 Compose 落地前的首帧。 -->
+    <style name="Theme.Ledger" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/ledger_window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

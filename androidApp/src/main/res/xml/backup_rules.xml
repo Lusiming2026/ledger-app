@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12 以下（API 31-）的云备份/本地备份规则。
+  android:allowBackup="false" 已经关掉整体自动备份，这里再显式排除一遍数据库与偏好，
+  作为「双保险」：即便有人在别处把 allowBackup 打开，账本数据也不会被上传到云端
+  （PRD §7.4：全部数据本地存储，不上云）。
+-->
+<full-backup-content>
+    <!-- SQLCipher 加密库：绝不允许进云备份（DB Key 在 Keystore 里，云端拿到库也解不开，但没必要传） -->
+    <exclude domain="database" path="." />
+    <!-- 外观模式 / 上次记账记忆 -->
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="external" path="." />
+</full-backup-content>

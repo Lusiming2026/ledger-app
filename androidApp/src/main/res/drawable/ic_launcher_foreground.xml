@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  图标前景：一个「账本 + 对勾」的极简图形。
+  108dp 画布，内容控制在中间 72dp 安全区内（自适应图标会被系统裁成圆形/方形）。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 账本外壳 -->
+    <path
+        android:fillColor="#FFF6F1E7"
+        android:pathData="M36,30 h40 a6,6 0 0 1 6,6 v36 a6,6 0 0 1 -6,6 h-40 a6,6 0 0 1 -6,-6 v-36 a6,6 0 0 1 6,-6 z" />
+
+    <!-- 书脊 -->
+    <path
+        android:fillColor="#FF2E7D6F"
+        android:pathData="M36,30 h8 v48 h-8 a6,6 0 0 1 -6,-6 v-36 a6,6 0 0 1 6,-6 z" />
+
+    <!-- 金额行 1 -->
+    <path
+        android:fillColor="#FFB9C3BF"
+        android:pathData="M52,42 h22 v4 h-22 z" />
+
+    <!-- 金额行 2（短） -->
+    <path
+        android:fillColor="#FFB9C3BF"
+        android:pathData="M52,52 h14 v4 h-14 z" />
+
+    <!-- 对勾 -->
+    <path
+        android:fillColor="#FF2E7D6F"
+        android:pathData="M52,64 l5,5 l13,-14 l4,4 l-17,18 l-9,-9 z" />
+</vector>

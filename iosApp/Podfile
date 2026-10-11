@@ -1,0 +1,37 @@
+# 记账 APP · iOS 侧依赖（PRD 未涉及工程细节，这里按「能一次跑起来」为准）
+#
+# 唯一一个 pod：SQLCipher。
+#
+# 为什么必须显式引入它，而不是靠 SQLDelight 自带的 native driver：
+#   shared/build.gradle.kts 里 `linkSqlite = false`（见那里的注释），
+#   SQLDelight 不会自动链接系统 SQLite。系统 SQLite 不认识 SQLCipher 的
+#   `PRAGMA key`——不链接 SQLCipher 的话，要么「以为加密了其实没加密」，
+#   要么直接报 “file is not a database”。
+#   因此 SQLCipher 的符号必须由这里在 Xcode 链接阶段提供。
+#
+# 用法（在 Mac 上）：
+#   1. cd iosApp
+#   2. pod install
+#   3. 打开 LedgerApp.xcworkspace（不是 .xcodeproj）
+#
+# 注意：KMP 的 Shared.framework 不是 CocoaPods 依赖，它由 Gradle 产出、
+# 通过 FRAMEWORK_SEARCH_PATHS + 一个 Run Script 阶段引入（见 project.yml）。
+
+platform :ios, '15.0'
+
+# 静态 framework 不需要 use_frameworks! 的动态封装；
+# 这里显式声明为静态链接，避免 pod 与 KMP framework 出现重复符号。
+use_frameworks! :linkage => :static
+
+target 'LedgerApp' do
+  pod 'SQLCipher', '~> 4.5'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # 与 project.yml 的 deploymentTarget 保持一致，避免 pod 用更低的 iOS 版本
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+  end
+end

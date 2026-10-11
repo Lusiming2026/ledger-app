@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  T27 静态快捷方式：长按桌面图标 →「记一笔」，冷启动直达 P03 快速记账页。
+  MainActivity 通过 intent.action == com.ledger.android.action.RECORD 识别。
+  「快速记账 ≤ 3 步」是产品的生死线，这条捷径把它压缩到 1 步。
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_record"
+        android:shortcutId="record_expense"
+        android:shortcutLongLabel="@string/shortcut_record_long"
+        android:shortcutShortLabel="@string/shortcut_record_long">
+        <intent
+            android:action="com.ledger.android.action.RECORD"
+            android:targetClass="com.ledger.android.MainActivity"
+            android:targetPackage="com.ledger.android" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+</shortcuts>

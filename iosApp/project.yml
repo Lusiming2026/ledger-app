@@ -1,0 +1,76 @@
+# XcodeGen 工程描述（T31 上架前的工程化，不引入 .xcodeproj 二进制文件）
+#
+# 为什么用 XcodeGen 而不是直接提交 .xcodeproj：
+#   .xcodeproj 是二进制/结构化 plist，任何人手工改一次就会产生无法 review 的 diff，
+#   且多人协作时极易冲突。用一份 YAML 描述工程，`xcodegen generate` 随时重建，
+#   merge 冲突变成纯文本冲突。
+#
+# 用法（在 Mac 上）：
+#   1. brew install xcodegen
+#   2. cd iosApp && xcodegen generate
+#   3. pod install
+#   4. open LedgerApp.xcworkspace
+
+name: LedgerApp
+
+options:
+  bundleIdPrefix: com.ledger
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    # 只支持竖屏：记账页底部有自制数字键盘，横屏会被安全区挤得很勉强
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+    SWIFT_STRICT_CONCURRENCY: minimal
+
+targets:
+  LedgerApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ledger.ios
+        PRODUCT_NAME: LedgerApp
+        INFOPLIST_FILE: iosApp/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        # Kotlin/Native 产出的 Shared.framework 位置。
+        # `embedAndSignAppleFrameworkForXcode` 在 Xcode 环境下会把 framework 放这里
+        # （见下方 preBuildScripts）。
+        FRAMEWORK_SEARCH_PATHS:
+          - $(inherited)
+          - $(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+        OTHER_LDFLAGS:
+          - $(inherited)
+          - -framework
+          - Shared
+        # 静态 framework 不需要 embed & sign
+        LD_RUNPATH_SEARCH_PATHS:
+          - $(inherited)
+          - "@executable_path/Frameworks"
+
+    preBuildScripts:
+      - name: Build Shared.framework (Kotlin Multiplatform)
+        basedOnDependencyAnalysis: false
+        script: |
+          # 让 Gradle 按当前 Xcode 的 CONFIGURATION / SDK_NAME / ARCHS 产出对应架构的
+          # Shared.framework，省去手工跑 link 任务。
+          #
+          # 注意：如果 gradle 报 “Task 'embedAndSignAppleFrameworkForXcode' not found”，
+          # 说明 Kotlin Gradle Plugin 版本没有为静态 framework 生成该任务，此时改成：
+          #   ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64   （模拟器）
+          #   ./gradlew :shared:linkReleaseFrameworkIosArm64          （真机）
+          # 并把 FRAMEWORK_SEARCH_PATHS 指向
+          #   $(SRCROOT)/../shared/build/bin/<target>/<debug|release>Framework
+          cd "$SRCROOT/.."
+          if [ -x "./gradlew" ]; then
+            ./gradlew :shared:embedAndSignAppleFrameworkForXcode
+          else
+            echo "warning: 找不到 gradlew，跳过 Shared.framework 构建（请先手动构建）"
+          fi
